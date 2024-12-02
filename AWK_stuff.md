@@ -51,7 +51,7 @@ sed -e 's/\s/,/g' -e 's/   */,/g' file > file.csv
 ```
 
 ## Transform the matrix above into something that looks like a 2d numpy array. However I was not able to load into python. I found the info here and here.
-```
+```sh
 awk '{print "["$0"]"}' matrix | sed -e 's/\s/,/g' -e 's/   */,/g' | sed 's/,]/],/g' | sed 's/,1],/,1]]/' | sed 's/\[1,/[[1,/'
 
 Output looks like this:
@@ -63,30 +63,26 @@ Output looks like this:
 [0.25,0.0625,0.107143,1,1,0.583333],
 [0.047619,0.107143,0.183673,0.583333,0.583333,1]]
 ```
-
-
+```sh
 awk '{if($1="pve_haplotypeT_001 && $4>27468912) print $0}' /home/ubuntu/emiliano/pve_final-files_backup/gff/pve_haplotypeT_exons.final.gff |less
-
-
 ```
+
+```sh
 bcftools query -f '%POS\t%INFO/InbreedingCoeff\n' EM33_snp_indel_novar_flagged_filtered_header_fixed_biallelic_no_indel_001.vcf.gz > inb_coeff
 
 awk '{A[$2]++}END{for(i in A)print i,A[i]}' inb_coeff | awk '{ printf("%.1g %3g\n", $1, $2) }' | awk '{ seen[$1] += $2 } END { for (i in seen) print i, seen[i] }'
 ```
 
-Problem: concatenate files but keep the file name as a column.
-https://unix.stackexchange.com/questions/153773/cat-a-directories-files-apending-the-file-name-to-the-row-of-text-and-removing-t
-```
+Problem: concatenate files but keep the file name as a column. Got code from [here](https://unix.stackexchange.com/questions/153773/cat-a-directories-files-apending-the-file-name-to-the-row-of-text-and-removing-t)
+```sh
 Example
 cd  /home/ubuntu/emiliano/2nd_chp/scikit/pi/output/50k_window
 awk 'NR<1; FNR>1 {print FILENAME,$0}' *4fold* > all.txt
 ```
 
-To add 2000bp downstream of any coding region to the gff
-
-```
+## Add 2000bp downstream of any coding region to the gff
+```sh
 awk '{$4-=2000}1' pve_haplotypeT_transcript.final.gff | awk '{$5+=2000}1' | awk '{$4=($4<0)?1:$4}1' | awk -v OFS='\t' '{print $1,$2,$3,$4,$5,$6,$7,$8,$9}' | sed '1d' > pve_haplotypeT_transcript_2kb_downstream_2.final.gff
-
 ```
 
 ## Create new column based on information of other column. Found here.
@@ -104,7 +100,6 @@ awk 'NR==0{$8="";print;next}\
 ```
 
 ## Shuffle lines from this link (https://stackoverflow.com/questions/2153882/how-can-i-shuffle-the-lines-of-a-text-file-on-the-unix-command-line-or-in-a-shel/2153889#2153889)
-
 ```sh
 shuffle() { 
     awk 'BEGIN{srand();} {printf "%06d %s\n", rand()*1000000, $0;}' | sort -n | cut -c8-
@@ -113,7 +108,6 @@ shuffle() {
 USAGE:
 any_command | shuffle
 ```
-
 
 ```
 bcftools query -f '%CHROM %POS[\t%DP]\n' FILE.vcf.gz | head | awk '{for(i=1; i<=NF; i++) {a[i]+=$i; if($i!="") b[i]++}}; END {for(i=1; i<=NF; i++) printf "%s%s", a[i]/b[i], (i==NF?ORS:OFS)}'
