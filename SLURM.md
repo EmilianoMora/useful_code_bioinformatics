@@ -3,6 +3,7 @@ squeue # To see the lists of current jobs running (or waiting) in the cluster
 smap -i 1 # To see live the status of each job running (or waiting) in the cluster.
 scancel # Cancels a job.
 
+for x in {001..011}; do sbatch by_chrom.sh $x; done
 
 to check sizes of all directories
 du -h --max-depth=1
