@@ -96,3 +96,14 @@ vcftools --gzvcf merged_allpops_s_locus_filtered_transcripts_norepeats.vcf.gz --
 
 bcftools filter -i 'QUAL>998 && GQ>98' -r pve_haplotypeT_001:27600446-27649965 merged_allpops_s_locus_filtered_transcripts_norepeats.vcf.gz | grep -v '^#' |  grep 27638819
 ```
+
+Taken from [here](https://www.biostars.org/p/291147/#291167).  Tells you the sites that are heterozygous and also counts the number of heterozygote individuals per site.
+```
+paste <(bcftools view 
+EM33_snp_novar_flagged_filtered_biallelic.vcf.gz |\
+    awk -F"\t" 'BEGIN {print "CHR\tPOS\tID\tREF\tALT"} \
+      !/^#/ {print $1"\t"$2"\t"$3"\t"$4"\t"$5}') \
+    \
+  <(bcftools query -f '[\t%SAMPLE=%GT]\n' EM33_snp_novar_flagged_filtered_biallelic.vcf.gz |\
+    awk 'BEGIN {print "nHet"} {print gsub(/0\|1|1\|0|0\/1|1\/0/, "")}')
+```
