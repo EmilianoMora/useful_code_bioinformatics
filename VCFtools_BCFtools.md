@@ -107,3 +107,31 @@ EM33_snp_novar_flagged_filtered_biallelic.vcf.gz |\
   <(bcftools query -f '[\t%SAMPLE=%GT]\n' EM33_snp_novar_flagged_filtered_biallelic.vcf.gz |\
     awk 'BEGIN {print "nHet"} {print gsub(/0\|1|1\|0|0\/1|1\/0/, "")}')
 ```
+
+Note:
+
+I re-ran some filtering of the VCF with GATK. However, when I added the command '--missing-values-evaluate-as-failing  true'. That command automatically changes the filtering to 'NO PASS' whenever some filter is missing. I realized that for some reason I lost a lot of information when using this command. When checking the files I realized that, for example, the info 'MQRankSum' and 'ReadPosRankSum' were missing. By reading this, and corroborating here I figured that these INFO can only be generated for sites where there are reads supporting the ancestral and the derived allele. Thus, in sites where there are only derived alleles  the info 'MQRankSum' and 'ReadPosRankSum' cannot be generated. IN these cases, using the '--missing-values-evaluate-as-failing  true' command will cause the elimination of all sites where only the derived allele is present.
+
+
+#############################################################################################################################
+
+So I read that when specifying the filters for GATK one should use parenthesis, specially when running several filter at the time. Otherwise they might no work properly. I tried several combination just to find out that they don't make that much of a difference (at least in my current version of GATK). I tried the following commands and they all gave similar results. 
+
+Example one (w/o parenthesis):
+```
+-filter "DP < 10 || DP > 400" --filter-name "DP10-400" \
+-G-filter "DP < 6 || DP > 60" --genotype-filter-name "DP_6-60" \
+```
+
+Example two (w/ parenthesis):
+```
+-filter "(DP < 10) || (DP > 400)" --filter-name "DP10-400" \
+-G-filter "(DP < 6) || (DP > 60)" --genotype-filter-name "DP_6-60" \
+```
+
+Example three (separate lines):
+```
+-filter "DP < 10" --filter-name "DP10" \
+-filter "DP > 400" --filter-name "DP400" \
+-G-filter "(DP < 6) || (DP > 60)" --genotype-filter-name "DP_6-60" \
+```
