@@ -1,37 +1,29 @@
-## To estimate the average of a specific column. Note: this does not take into account the missing data (NA).
-
+## Estimate the average of a specific column. Note: this does not take into account the missing data.
 ```sh
 awk '{total +=$3} END {print total/(NR)}' file # where $3 is the number of the column and NR is the number fo records.
 awk '{total +=$3} END {print total/(NR - 1)}' file # add the -1 if there is a name in the column.
 ```
 
-## Code to estimate average and standard deviation with awk
-
-```sh
-awk '{ sum += $5; n++ } END { if (n > 0) print sum / n; }' FILE.txt
-
-awk '{for(i=5;i<=NF;i++) {sum[i] += $i; sumsq[i] += ($i)^2}} END {for (i=1;i<=NF;i++) {printf "%f %f \n", sum[i]/NR, sqrt((sumsq[i]-sum[i]^2/NR)/NR)}}' FILE.txt
-```
-
-## To estimate the average while taking missing data into account the use the following command.
+## Estimate the average while taking missing data into account.
 ```
 awk '{sum +=$3; if($3 != "nan"){count+=1}} END {print sum/count}' file # where "nan" should be replaced by however missing data is coded (e.g., NA, NaN, etc.)
 ```
 
-```
-bcftools query -f '%CHROM %POS[\t%DP]\n' FILE.vcf.gz | head | awk '{for(i=1; i<=NF; i++) {a[i]+=$i; if($i!="") b[i]++}}; END {for(i=1; i<=NF; i++) printf "%s%s", a[i]/b[i], (i==NF?ORS:OFS)}'
+## Estimate standard deviation.
+```sh
+awk '{for(i=5;i<=NF;i++) {sum[i] += $i; sumsq[i] += ($i)^2}} END {for (i=1;i<=NF;i++) {printf "%f %f \n", sum[i]/NR, sqrt((sumsq[i]-sum[i]^2/NR)/NR)}}' FILE.txt
 ```
 
-Convert data in a column based on data of other column.
-```
+## Convert data in a column based on data of other column.
+```sh
 awk 'BEGIN{FS=OFS="\t"} {if($6 <= 10){$3="nan"}{print}}' file # If data on column 6 ($6) is less than or equal to 10 then flip cell in column 3 ($3) to nan.
-awk 'BEGIN{FS=OFS="\t"} {if($6 < 10){$3="nan"}{print}}' file # If data on column 6 ($6) is less then 10 then flip cell in column 3 ($3) to nan.
+awk 'BEGIN{FS=OFS="\t"} {if($6 < 10){$3="nan"}{print}}' file # If data on column 6 ($6) is less than 10 then flip cell in column 3 ($3) to nan.
 
 awk '{for(i=1; i<=NF; i++){sum[i] += $i; if($i != "nan"){count[i]+=1}}} END {for(i=1; i<=NF; i++){if(count[i]!=0){v = sum[i]/count[i]else{v = 0}; if(i<NF){printf "%f\t",v}else{print v}}}' file # This one does the same as above but for every column as loop.
 ```
 
-To eliminate ALL columns AND rows that are 'nan' (i.e., zero). In the case of the linkage disequilibrium you end up with a squared matrix.  Taken from here.
-```
+## To eliminate ALL columns AND rows that are 'nan' (i.e., zero). In the case of the linkage disequilibrium you end up with a squared matrix.  Taken from here.
+```sh
 awk '{show=0; for (i=1; i<=NF; i++) {if ($i!=0) show=1; col[i]+=$i;}} show==1{tr++; for (i=1; i<=NF; i++) vals[tr,i]=$i; tc=NF} END{for(i=1; i<=tr; i++) { for (j=1; j<=tc; j++) { if (col[j]>0) printf("%s%s", vals[i,j], OFS)} print ""; } }' EM33_report_sq_win.ld | awk '{s=0; for (i=3;i<=NF;i++) s+=$i; if (s!=0)print}'
 
 The output looks like this:
@@ -45,7 +37,7 @@ The output looks like this:
 ```
 
 The above command looks complicated but the first AWK command columns with ALL 'zeros' or 'nan'. Whereas the second AWK command eliminates rows with ALL 'zeros' or 'nan'.
-```
+```sh
 1)
 awk '{show=0; for (i=1; i<=NF; i++) {if ($i!=0) show=1; col[i]+=$i;}} show==1{tr++; for (i=1; i<=NF; i++) vals[tr,i]=$i; tc=NF} END{for(i=1; i<=tr; i++) { for (j=1; j<=tc; j++) { if (col[j]>0) printf("%s%s", vals[i,j], OFS)} print ""; } }' EM33_report_sq_win.ld
 
@@ -53,12 +45,12 @@ awk '{show=0; for (i=1; i<=NF; i++) {if ($i!=0) show=1; col[i]+=$i;}} show==1{tr
 awk '{s=0; for (i=3;i<=NF;i++) s+=$i; if (s!=0)print}' EM33_report_sq_win.ld
 ```
 
-To transform a space delimited output (example above) into a csv.
+## To transform a space delimited output (example above) into a csv.
 ```
 sed -e 's/\s/,/g' -e 's/   */,/g' file > file.csv
 ```
 
-The following command transforms the matrix above into something that looks like a 2d numpy array. However I was not able to load into python. I found the info here and here.
+## Transform the matrix above into something that looks like a 2d numpy array. However I was not able to load into python. I found the info here and here.
 ```
 awk '{print "["$0"]"}' matrix | sed -e 's/\s/,/g' -e 's/   */,/g' | sed 's/,]/],/g' | sed 's/,1],/,1]]/' | sed 's/\[1,/[[1,/'
 
@@ -97,7 +89,7 @@ awk '{$4-=2000}1' pve_haplotypeT_transcript.final.gff | awk '{$5+=2000}1' | awk 
 
 ```
 
-Create new column based on information of other column. Found here.
+## Create new column based on information of other column. Found here.
 ```
 awk 'NR==0{$8="";print;next}\
  $1 == "RS170_4fold_pi" {$8="D"};\
@@ -111,19 +103,19 @@ awk 'NR==0{$8="";print;next}\
  $1 == "EM33_4fold_pi" {$8="M"}1' all.txt | column -t > all_pops_4fold.txt
 ```
 
-Shuffle lines from this link (https://stackoverflow.com/questions/2153882/how-can-i-shuffle-the-lines-of-a-text-file-on-the-unix-command-line-or-in-a-shel/2153889#2153889)
+## Shuffle lines from this link (https://stackoverflow.com/questions/2153882/how-can-i-shuffle-the-lines-of-a-text-file-on-the-unix-command-line-or-in-a-shel/2153889#2153889)
 
-```
+```sh
 shuffle() { 
     awk 'BEGIN{srand();} {printf "%06d %s\n", rand()*1000000, $0;}' | sort -n | cut -c8-
 }
 
 USAGE:
 any_command | shuffle
-
-can also be 
-
-shuffle() {
-    awk 'BEGIN{srand();} {printf "%06d %s\n", rand()*1000000, $0;}' | sort -n | cut -c8-
-}
 ```
+
+
+```
+bcftools query -f '%CHROM %POS[\t%DP]\n' FILE.vcf.gz | head | awk '{for(i=1; i<=NF; i++) {a[i]+=$i; if($i!="") b[i]++}}; END {for(i=1; i<=NF; i++) printf "%s%s", a[i]/b[i], (i==NF?ORS:OFS)}'
+```
+
