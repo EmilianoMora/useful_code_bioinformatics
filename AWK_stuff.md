@@ -36,20 +36,6 @@ The output looks like this:
 0.047619 0.107143 0.183673 0.583333 0.583333 1
 ```
 
-The above command looks complicated but the first AWK command columns with ALL 'zeros' or 'nan'. Whereas the second AWK command eliminates rows with ALL 'zeros' or 'nan'.
-```sh
-1)
-awk '{show=0; for (i=1; i<=NF; i++) {if ($i!=0) show=1; col[i]+=$i;}} show==1{tr++; for (i=1; i<=NF; i++) vals[tr,i]=$i; tc=NF} END{for(i=1; i<=tr; i++) { for (j=1; j<=tc; j++) { if (col[j]>0) printf("%s%s", vals[i,j], OFS)} print ""; } }' EM33_report_sq_win.ld
-
-2)
-awk '{s=0; for (i=3;i<=NF;i++) s+=$i; if (s!=0)print}' EM33_report_sq_win.ld
-```
-
-## To transform a space delimited output (example above) into a csv.
-```
-sed -e 's/\s/,/g' -e 's/   */,/g' file > file.csv
-```
-
 ## Transform the matrix above into something that looks like a 2d numpy array. However I was not able to load into python. I found the info here and here.
 ```sh
 awk '{print "["$0"]"}' matrix | sed -e 's/\s/,/g' -e 's/   */,/g' | sed 's/,]/],/g' | sed 's/,1],/,1]]/' | sed 's/\[1,/[[1,/'
@@ -63,6 +49,16 @@ Output looks like this:
 [0.25,0.0625,0.107143,1,1,0.583333],
 [0.047619,0.107143,0.183673,0.583333,0.583333,1]]
 ```
+
+The above command looks complicated but the first AWK command columns with ALL 'zeros' or 'nan'. Whereas the second AWK command eliminates rows with ALL 'zeros' or 'nan'.
+```sh
+1)
+awk '{show=0; for (i=1; i<=NF; i++) {if ($i!=0) show=1; col[i]+=$i;}} show==1{tr++; for (i=1; i<=NF; i++) vals[tr,i]=$i; tc=NF} END{for(i=1; i<=tr; i++) { for (j=1; j<=tc; j++) { if (col[j]>0) printf("%s%s", vals[i,j], OFS)} print ""; } }' EM33_report_sq_win.ld
+
+2)
+awk '{s=0; for (i=3;i<=NF;i++) s+=$i; if (s!=0)print}' EM33_report_sq_win.ld
+```
+
 ```sh
 awk '{if($1="pve_haplotypeT_001 && $4>27468912) print $0}' /home/ubuntu/emiliano/pve_final-files_backup/gff/pve_haplotypeT_exons.final.gff |less
 ```
@@ -99,7 +95,7 @@ awk 'NR==0{$8="";print;next}\
  $1 == "EM33_4fold_pi" {$8="M"}1' all.txt | column -t > all_pops_4fold.txt
 ```
 
-## Shuffle lines from this link (https://stackoverflow.com/questions/2153882/how-can-i-shuffle-the-lines-of-a-text-file-on-the-unix-command-line-or-in-a-shel/2153889#2153889)
+## Shuffle lines from this [link](https://stackoverflow.com/questions/2153882/how-can-i-shuffle-the-lines-of-a-text-file-on-the-unix-command-line-or-in-a-shel/2153889#2153889)
 ```sh
 shuffle() { 
     awk 'BEGIN{srand();} {printf "%06d %s\n", rand()*1000000, $0;}' | sort -n | cut -c8-
@@ -113,3 +109,7 @@ any_command | shuffle
 bcftools query -f '%CHROM %POS[\t%DP]\n' FILE.vcf.gz | head | awk '{for(i=1; i<=NF; i++) {a[i]+=$i; if($i!="") b[i]++}}; END {for(i=1; i<=NF; i++) printf "%s%s", a[i]/b[i], (i==NF?ORS:OFS)}'
 ```
 
+## To transform a space delimited output (example above) into a csv.
+```
+sed -e 's/\s/,/g' -e 's/   */,/g' file > file.csv
+```
