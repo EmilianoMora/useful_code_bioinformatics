@@ -118,3 +118,8 @@ bcftools query -f '%CHROM %POS[\t%DP]\n' FILE.vcf.gz | head | awk '{for(i=1; i<=
 ```
 sed -e 's/\s/,/g' -e 's/   */,/g' file > file.csv
 ```
+
+## Detect repeated values in a VCF file
+```
+zmore Pella_palla.4fold.vcf.gz | grep -v ^## | awk '{print $1,$2}' | uniq -d
+```
