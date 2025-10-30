@@ -23,4 +23,6 @@ scp /run/user/$UID/gvfs/smb-share\:server\=idnas37.d.uzh.ch,share\=g_systbot_met
 scp /source_directory/file.txt ubuntu@IP_ADDRESS:target_dir/
 #From remote computer to local
 scp ubuntu@IP_ADDRESS:source_dir/file.txt /target_directory/
+#From remote to remote
+scp username@remote_1:/file/to/send username@remote_2:/where/to/put
 ```
