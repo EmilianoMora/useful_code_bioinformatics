@@ -19,5 +19,8 @@ rsync -avz -e "ssh -i .ssh/NAME_OF_KEY" source_dir/ ubuntu@IP_ADDRESS:target_dir
 # scp
 ```
 scp /run/user/$UID/gvfs/smb-share\:server\=idnas37.d.uzh.ch,share\=g_systbot_metabolomics$/WGS/F24A910000236-01_ERYtrjgR_20250822035936/1/1.png ubuntu@172.23.85.230:/home/ubuntu/emiliano
+#From local computer to remote computer
 scp /source_directory/file.txt ubuntu@IP_ADDRESS:target_dir/
+#From remote computer to local
+scp ubuntu@IP_ADDRESS:source_dir/file.txt /target_directory/
 ```
