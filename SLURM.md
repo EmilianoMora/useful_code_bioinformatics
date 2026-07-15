@@ -13,14 +13,10 @@ scancel # Cancels a job.
 ```sh
 for x in {001..011}; do sbatch by_chrom.sh $x; done
 ```
-to check sizes of all directories
-du -h --max-depth=1
-
-```
-854 second_job.slurm #to run a scrit after another job is finished
-
+## Run sbatch after one job has finished
+```sh
 sbatch --dependency=afterok:[id first job] [name of second job].sh
-sbatch --dependency=afterok:113424 /home/ubuntu/emiliano/2nd_chp/mapped_reads/RSBK01/bwa_RSBK01.sh
+sbatch --dependency=afterok:113424 bwa_RSBK01.sh
 ```
 
 
