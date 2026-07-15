@@ -1,10 +1,4 @@
-## Uninstall AGAT
-
-```sh
-conda uninstall agat
-```
-
-Install AGAT again to get the newest version
+## Install AGAT again to get the newest version
 ```
 conda activate emiliano3.6
 conda install -c bioconda agat
@@ -15,7 +9,6 @@ make
 make test                                       
 make install
 ```
-
 ## Run AGAT
 ```sh
 conda activate emiliano3.6
