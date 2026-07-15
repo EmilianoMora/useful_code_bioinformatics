@@ -1,3 +1,9 @@
+# Some useful commands to use in slurm
+## Checking the running programs in real-time
+```sh
+smap -i 1
+```
+
 sbatch # To run a *.sh script
 squeue # To see the lists of current jobs running (or waiting) in the cluster
 smap -i 1 # To see live the status of each job running (or waiting) in the cluster.
